@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FRA Samanvay Prototype</title>
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Sidebar scrolls independently */
+    aside {
+      border-right: 2px solid #e5e7eb; /* light gray border */
+      background-color: #ffffff;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Map section (right/main area) */
+    #map {
+      height: 70vh; /* fixed visible height (adjust as you like) */
+      width: 100%;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* Bottom filtered list section (if you have one) */
+    #filtered-section {
+      border-top: 2px solid #e5e7eb; /* separate from map */
+      background-color: #ffffff;
+      padding: 1rem;
+      overflow-y: auto;
+      box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .leaflet-container {
+       transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+
+    .font-sans {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+        sans-serif;
+
+    }
+  </style>
+</head>
+
+<body class="font-sans">
+  <div class="flex flex-col md:flex-row h-screen w-screen">
+    <!-- Sidebar -->
+    <aside class="w-full md:w-96 p-4 bg-white shadow-lg z-10">
+      <h1 class="text-2xl font-bold mb-2">FRA Samanvay Prototype</h1>
+      <p class="text-sm text-gray-600 mb-4">
+        Interactive prototype showing state-level FRA metrics, simple DSS
+        recommendations, and mock integration points.
+      </p>
+
+      <div class="mb-4">
+        <label for="search-input" class="block text-sm font-medium">Search state</label>
+        <input
+          id="search-input"
+          class="mt-1 block w-full rounded border p-2"
+          placeholder="Type state name"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label for="filter-slider" class="block text-sm font-medium"
+          >Filter: min claims disposed % (<span id="slider-value">0</span>)</label
+        >
+        <input id="filter-slider" type="range" min="0" max="100" value="0" class="w-full" />
+      </div>
+
+      <div class="mb-4">
+        <h3 class="font-semibold">Top States by Titles</h3>
+        <div style="height: 180px;">
+          <canvas id="top-states-chart"></canvas>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h3 class="font-semibold">Quick Actions</h3>
+        <button
+          onclick="alert('Exported mock CSV (placeholder)');"
+          class="mt-2 w-full p-2 rounded bg-blue-600 text-white"
+        >
+          Export filtered CSV
+        </button>
+        <button
+          onclick="alert('Start mock OCR pipeline (placeholder)');"
+          class="mt-2 w-full p-2 rounded border"
+        >
+          Run OCR/NER on scanned pattas
+        </button>
+      </div>
+
+      <div>
+        <h3 class="font-semibold">Selected State</h3>
+        <div id="selected-state-panel" class="mt-2 text-sm">
+          <p class="text-gray-600">
+            Click a marker on the map to view state details and scheme
+            recommendations.
+          </p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main section: map + list -->
+    <main class="flex-1">
+      <!-- Map on top -->
+      <div id="map"></div>
+
+      <!-- List at bottom -->
+      <div id="filtered-section">
+        <h3 class="font-semibold mb-2">
+          Filtered States (<span id="filtered-count">0</span>)
+        </h3>
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-gray-600 border-b">
+              <th class="pr-4 py-1">State</th>
+              <th class="pr-4 py-1">Claims</th>
+              <th class="pr-4 py-1">Titles</th>
+              <th class="pr-4 py-1">Disposed %</th>
+            </tr>
+          </thead>
+          <tbody id="filtered-table-body"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Your logic -->
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>
